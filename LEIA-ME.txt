@@ -1,0 +1,38 @@
+SERVIÇOS DA FÁBRICA — PACOTE INDEPENDENTE DO V25
+
+Abra INSTRUCOES_DE_INSTALACAO.html para o passo a passo completo.
+
+REPOSITÓRIO SUGERIDO: controle-servicos-fabrica
+Publique o conteúdo deste ZIP nesse NOVO repositório.
+Mantenha o V25 no repositório sistema-manutencao-v25.
+
+Este pacote já usa Controle_de_Servicos_da_Manutencao.html, sem (7).
+Abra pelo index.html. Preserve os arquivos e a pasta icons juntos.
+
+NOVOS REGISTROS E CONEXÃO
+Esta cópia usa armazenamento próprio no navegador e uma identificação de
+sala própria na nuvem. Ela começa sem os registros/configurações antigos.
+Para trazer serviços, exporte um backup da versão anterior e importe em
+Dados nesta cópia. Não publique o backup no GitHub.
+
+INSTALAÇÃO
+No novo repositório: Settings > Pages > Deploy from a branch > main > /(root).
+Abra o endereço HTTPS publicado e use Instalar aplicativo no Chrome/Edge.
+Defina uma senha em Dados e ative Modo fábrica no tablet.
+
+LEITOR
+USB ou Bluetooth em modo teclado, com Enter ao final. Para QR, leitor 2D.
+As etiquetas de serviços ficam em Folha QR.
+
+ESCOPO
+Após salvar, a tela volta ao início e limpa o serviço selecionado. O trabalho
+em andamento continua ativo. Após 90 segundos sem interação, a tela retorna
+ao início e descarta somente campos ainda não salvos.
+Mantida a regra de um serviço em andamento por vez. A sincronização atual
+ainda é de demonstração e não coordena gravações simultâneas de vários aparelhos.
+
+TESTE
+No teste no navegador, foram conferidos a separação das chaves de dados,
+da configuração e do IndexedDB, o destino exclusivo da sala de nuvem,
+o index com o novo nome, o retorno após apontamento e a reabertura offline.
+Nenhuma alteração foi feita no GitHub ou no sistema V25 publicado.
