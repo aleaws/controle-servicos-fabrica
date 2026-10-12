@@ -1,47 +1,74 @@
-SERVIÇOS DA FÁBRICA — VERSÃO 3 — OPERADORES E CARTÕES
+SERVIÇOS DA FÁBRICA — VERSÃO 3.1 — RELATÓRIO POR OPERADOR
 12/10/2026
 
-AGORA: vários serviços em andamento, com operadores diferentes.
-Um serviço em andamento por operador. O cartão identifica quem está apontando.
-Depois de salvar no modo fábrica, a tela volta ao início e desconecta o cartão.
+NOVA ABA: POR OPERADOR
+- Filtro por operador e mês, ou todos os meses.
+- Peças feitas, boas e não conformes.
+- Trabalho cronometrado e informado manualmente, em colunas separadas.
+- Paradas programadas, outras paradas e fora do expediente.
+- Serviços atendidos, conclusões realizadas e motivos das paradas.
+- Detalhamento por serviço e apontamento de peças.
+- Impressão / salvar PDF pelo navegador e resumo CSV.
 
-ATUALIZAÇÃO DA SUA VERSÃO 2
-1. Em cada aparelho, aguarde Sincronizado. Exporte um backup na aba Dados.
-2. Feche todas as janelas e aplicativos da fábrica, em todos os aparelhos.
-3. No mesmo projeto Supabase, execute TODO o CONFIGURAR_SUPABASE.sql deste ZIP.
-4. Atualize os arquivos de mesmo nome no repositório controle-servicos-fabrica,
-   mantendo a pasta icons. Aguarde a publicação do GitHub Pages.
-5. Abra com internet. Em Dados, confira: versão 3 — operadores e cartões.
-   Se ainda aparecer versão 2, feche tudo e abra novamente após a atualização.
-6. Em Cadastros > Operadores e cartões, cadastre nome e código do cartão.
-   A senha administrativa atual é pedida para salvar. Imprima os cartões QR
-   ou use cartões existentes, cadastrando exatamente o código lido pelo leitor.
-7. Ative Modo fábrica. Leia o cartão, depois o serviço e confirme a ação.
+PARA ATUALIZAR A SUA VERSÃO 3
+1. Em cada aparelho, aguarde Sincronizado. Em Dados, exporte um backup.
+2. Feche o aplicativo e as abas em todos os aparelhos. Extraia este ZIP.
+3. No GitHub, abra SOMENTE o repositório controle-servicos-fabrica.
+4. Envie o conteúdo extraído, substituindo os arquivos de mesmo nome.
+   Mantenha index.html e a pasta icons. Não envie o backup de registros.
+5. Confirme a alteração e aguarde a publicação do GitHub Pages.
+6. Abra com internet. Em Dados, confira:
+   versão 3.1 — relatório por operador.
+7. Confira essa versão também no celular e nos tablets. Se ainda estiver
+   antiga, feche todas as janelas do aparelho e abra novamente.
 
-A conta de conexão e as chaves que você já configurou continuam as mesmas.
-O operador não precisa de e-mail. A configuração da conexão fica no aparelho.
-Não reinstale nem apague dados do navegador. Não envie backups ao GitHub.
-A atualização não modifica o repositório nem as tabelas do V25.
+QUEM JÁ USA A VERSÃO 3 NÃO PRECISA EXECUTAR SQL NOVAMENTE.
+Use as mesmas chaves, conta, sala e senha administrativa. Não reinstale
+nem apague os dados do navegador. O pacote conserva os nomes dos arquivos.
+Não altere o repositório sistema-manutencao-v25.
 
-IMPORTANTE
-O SQL também precisa ser atualizado: a trava antiga existe no banco.
-Depois de executar este SQL, versões antigas podem consultar, mas não gravar.
-Atualize todos os aparelhos. Registros pendentes da versão antiga devem ser
-sincronizados antes da troca; se já houver pendência, guarde o backup e revise.
+COMO REGISTRAR PEÇAS
+Leia o cartão, abra o serviço e use Registrar peças. Informe somente peças
+novas feitas pelo operador identificado e ainda não apontadas. O total inclui
+as não conformes. Ex.: fez 20 peças e 2 estão não conformes: total 20, NC 2.
+O apontamento não pausa nem conclui o serviço. No modo fábrica, a tela volta
+ao início e desconecta o cartão, como nas outras ações.
+Na conclusão, informe somente as peças que ainda não registrou. Se já
+registrou todas, deixe zero. O sistema soma o total do serviço automaticamente.
 
-Cada serviço tem um operador responsável. Transferência: serviço aberto ou
-interrompido > Alterar operador, fora do modo fábrica, com senha administrativa.
-O histórico anterior continua atribuído a quem realizou cada apontamento.
-Registros antigos sem operador não recebem um nome inventado.
+CORREÇÃO
+Fora do modo fábrica: Por operador > detalhe da pessoa > Apontamentos de
+peças > Corrigir peças. É exigida a senha administrativa e um motivo.
+A correção preserva o operador, a data e o registro original. Zero anula a
+quantidade. Corrigir um apontamento antigo atualiza o mês original e o total
+do serviço. Os totais detalhados não são editados diretamente em Dados.
 
-Sem internet, gravações ficam pendentes neste aparelho. O mesmo cartão usado
-para iniciar dois serviços em aparelhos offline gera conflito ao reconectar.
-Não use simultaneamente o mesmo cartão em dois aparelhos. Na revisão, uma
-cópia completa é guardada em Dados > Baixar cópias de recuperação.
+COMO LER O RELATÓRIO
+O tempo acompanha o operador de cada início/retomada/etapa manual.
+Ao transferir um serviço pausado, a pausa é dividida no horário da troca.
+Paradas são do serviço vinculado: NÃO representam automaticamente ociosidade
+da pessoa, pois ela pode trabalhar em outra tarefa durante a espera.
+Trabalho manual soma ao cronômetro; informe manualmente só o que não foi
+cronometrado. A jornada cadastrada é usada para recalcular os intervalos.
+Não é um relatório de ponto ou presença.
 
-Um tablet atende uma pessoa por vez para registrar a ação. Isso não exige
-aguardar o término do serviço: ele continua em andamento após liberar a tela.
-Use uma janela por navegador. Operadores não devem compartilhar cartões.
+Peças detalhadas entram no mês do apontamento. Totais antigos entram no mês
+da conclusão e só recebem um operador se a execução tiver uma identificação
+única e segura. Os demais ficam em Não identificado / sem distribuição.
+Registros existentes e cadastros são preservados. A atualização não inventa
+quantidades nem tempos que não foram registrados.
 
-O ZIP não contém seus dados reais, chaves ou senhas. Leia também
-INSTRUCOES_DE_INSTALACAO.html. Publicação e SQL precisam ser aplicados por você.
+A aba Relatório gerencial continua mostrando peças dos serviços concluídos
+no período. Por operador mostra as peças apontadas no período, incluindo
+serviços em andamento. Por isso os dois totais podem ser diferentes.
+
+O CSV contém o resumo por operador. A impressão contém também serviços,
+paradas e apontamentos detalhados. Ambos respeitam os filtros selecionados.
+Clique Atualizar relatório para renovar os tempos que continuam em andamento.
+
+INSTALAÇÃO NOVA OU VERSÃO 2
+Somente nesse caso, use também CONFIGURAR_SUPABASE.sql deste ZIP para instalar
+as regras da versão 3. Consulte INSTRUCOES_DE_INSTALACAO.html.
+
+Este ZIP não contém seus registros reais, chaves ou senhas.
+A publicação no GitHub é feita por você; baixar o ZIP não atualiza os aparelhos.
