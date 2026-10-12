@@ -1,6 +1,6 @@
 /* Guarda apenas os arquivos do aplicativo, nunca respostas de sincronização. */
 const ROOT=new URL('./',self.location.href);
-const PREFIX='servicos-fabrica-'+encodeURIComponent(ROOT.pathname)+'-',CACHE=PREFIX+'b310d5817486';
+const PREFIX='servicos-fabrica-'+encodeURIComponent(ROOT.pathname)+'-',CACHE=PREFIX+'f30d521a1b4b';
 const FILES=['./','./index.html','./Controle_de_Servicos_da_Manutencao.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png'];
 const URLS=FILES.map(path=>new URL(path,ROOT).href);
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(URLS))));

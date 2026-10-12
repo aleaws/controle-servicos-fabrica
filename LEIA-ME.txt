@@ -1,38 +1,36 @@
-SERVIÇOS DA FÁBRICA — PACOTE INDEPENDENTE DO V25
+SERVIÇOS DA FÁBRICA — CONEXÃO ENTRE APARELHOS — VERSÃO 2
+12/10/2026
 
-Abra INSTRUCOES_DE_INSTALACAO.html para o passo a passo completo.
+COMECE POR INSTRUCOES_DE_INSTALACAO.html
 
-REPOSITÓRIO SUGERIDO: controle-servicos-fabrica
-Publique o conteúdo deste ZIP nesse NOVO repositório.
-Mantenha o V25 no repositório sistema-manutencao-v25.
+1. No aplicativo atual: Dados > Exportar backup. Guarde o JSON no computador.
+2. Atualize os arquivos no repositório controle-servicos-fabrica, mantendo
+   os nomes e a pasta icons. Não envie backups JSON ao GitHub.
+3. Feche as janelas do app e abra novamente. Em Dados, confira o título
+   "Conexão entre aparelhos • versão 2".
+4. No Supabase: SQL Editor > New query. Cole CONFIGURAR_SUPABASE.sql e execute.
+5. Em Authentication > Users > Add user > Create new user, crie uma conta
+   de conexão com e-mail e senha. Confirme o e-mail desse usuário.
+6. Em Dados no app: URL, chave pública e sala FABRICA-AW. Entre com a conta
+   criada no passo 5. Aguarde "Sincronizado".
+7. No outro aparelho: mesmo endereço online, projeto, sala e conta.
 
-Este pacote já usa Controle_de_Servicos_da_Manutencao.html, sem (7).
-Abra pelo index.html. Preserve os arquivos e a pasta icons juntos.
+O ZIP não contém suas chaves, senhas ou registros. A configuração real no
+Supabase e a atualização no GitHub ainda precisam ser feitas por você.
+Não é necessário reinstalar o app ou apagar dados do navegador.
 
-NOVOS REGISTROS E CONEXÃO
-Esta cópia usa armazenamento próprio no navegador e uma identificação de
-sala própria na nuvem. Ela começa sem os registros/configurações antigos.
-Para trazer serviços, exporte um backup da versão anterior e importe em
-Dados nesta cópia. Não publique o backup no GitHub.
+A nova conexão usa tabelas próprias fabrica_aw_*_v2 e revisões atômicas.
+O script não altera as tabelas do V25. Não altere o repositório do V25.
 
-INSTALAÇÃO
-No novo repositório: Settings > Pages > Deploy from a branch > main > /(root).
-Abra o endereço HTTPS publicado e use Instalar aplicativo no Chrome/Edge.
-Defina uma senha em Dados e ative Modo fábrica no tablet.
+Sem internet, os apontamentos ficam locais e são enviados ao reconectar.
+Conflitos no mesmo serviço pausam o envio para revisão; as duas versões
+são preservadas. Depois de escolher manter o servidor, a cópia local fica
+em Dados > Baixar cópias de recuperação. Reaplique o necessário manualmente.
 
-LEITOR
-USB ou Bluetooth em modo teclado, com Enter ao final. Para QR, leitor 2D.
-As etiquetas de serviços ficam em Folha QR.
+Mantida a regra de UM serviço em andamento por vez na sala. Não há contas
+individuais por operador. A senha administrativa do app é diferente da
+conta de conexão Supabase. Use uma janela por navegador.
 
-ESCOPO
-Após salvar, a tela volta ao início e limpa o serviço selecionado. O trabalho
-em andamento continua ativo. Após 90 segundos sem interação, a tela retorna
-ao início e descarta somente campos ainda não salvos.
-Mantida a regra de um serviço em andamento por vez. A sincronização atual
-ainda é de demonstração e não coordena gravações simultâneas de vários aparelhos.
-
-TESTE
-No teste no navegador, foram conferidos a separação das chaves de dados,
-da configuração e do IndexedDB, o destino exclusivo da sala de nuvem,
-o index com o novo nome, o retorno após apontamento e a reabertura offline.
-Nenhuma alteração foi feita no GitHub ou no sistema V25 publicado.
+Testes: dois navegadores simulados e PostgreSQL local (PGlite), sem acessar
+o Supabase real. Confira a comunicação nos seus aparelhos antes de usar
+na produção. O leitor físico não foi testado.
