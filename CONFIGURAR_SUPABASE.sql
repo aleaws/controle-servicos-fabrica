@@ -1,6 +1,7 @@
--- SERVIÇOS DA FÁBRICA • sincronização v2 • 12/10/2026
--- Execute uma vez no SQL Editor do seu projeto Supabase.
--- Somente cria/atualiza objetos fabrica_aw_*_v2. Não altera tabelas do V25.
+-- SERVIÇOS DA FÁBRICA • versão 3 • operadores e cartões • 12/10/2026
+-- Atualiza a versão 2 sem apagar seus registros. Use o mesmo projeto.
+-- Sincronize e feche os apps antes. Depois publique e abra a versão 3 em todos.
+-- Preserva as tabelas fabrica_aw_*_v2. Não altera as tabelas do V25.
 begin;
 
 create table if not exists public.fabrica_aw_estado_v2 (
@@ -26,7 +27,7 @@ alter table public.fabrica_aw_mutacoes_v2 enable row level security;
 revoke all on public.fabrica_aw_estado_v2 from public, anon, authenticated;
 revoke all on public.fabrica_aw_mutacoes_v2 from public, anon, authenticated;
 
-create or replace function public.fabrica_aw_sync_v2(
+create or replace function public.fabrica_aw_sync_v3(
   p_sala text,
   p_revisao bigint default null,
   p_dados jsonb default null,
@@ -38,6 +39,7 @@ declare
   u uuid := auth.uid();
   linha public.fabrica_aw_estado_v2%rowtype;
   confirmado bigint;
+  operadores jsonb;
 begin
   if u is null then raise exception 'Entre na conta da fábrica.' using errcode = '42501'; end if;
   if p_sala is null or length(btrim(p_sala)) < 3 or length(p_sala) > 120 then
@@ -68,6 +70,18 @@ begin
   if linha.revisao <> p_revisao then
     return jsonb_build_object('aplicada',false,'revisao',linha.revisao,'dados',linha.dados);
   end if;
+  operadores:=coalesce(p_dados->'operadores','[]'::jsonb);
+  if jsonb_typeof(operadores) is distinct from 'array' then raise exception 'Cadastro de operadores inválido.'; end if;
+  if exists(select 1 from jsonb_array_elements(operadores) o
+    where coalesce(btrim(o->>'id'),'')='' or coalesce(btrim(o->>'nome'),'')=''
+      or coalesce(o->>'cartao','') !~ '^[A-Z0-9][A-Z0-9._:-]{0,79}$'
+      or jsonb_typeof(o->'ativo') is distinct from 'boolean') then
+    raise exception 'Confira nome, identificação, cartão e situação dos operadores.';
+  end if;
+  if exists(select 1 from jsonb_array_elements(operadores) o group by o->>'id' having count(*)>1)
+    or exists(select 1 from jsonb_array_elements(operadores) o group by upper(btrim(o->>'cartao')) having count(*)>1) then
+    raise exception 'Cada operador precisa de identificação e cartão únicos.';
+  end if;
   if exists(select 1 from jsonb_array_elements(p_dados->'servicos') s where coalesce(s->>'id','')='' or coalesce(s->>'codigo','')='')
      or exists(select 1 from jsonb_array_elements(p_dados->'eventos') e where coalesce(e->>'id','')='') then
     raise exception 'Há registros sem identificação. Revise o backup importado.';
@@ -77,13 +91,50 @@ begin
      or exists(select 1 from jsonb_array_elements(p_dados->'eventos') e group by e->>'id' having count(*)>1) then
     raise exception 'Há códigos ou identificações repetidos. Revise os registros.';
   end if;
-  if (select count(*) from jsonb_array_elements(p_dados->'servicos') s where s->>'estado'='Andamento')>1 then
-    raise exception 'Só pode existir um serviço em andamento nesta sala.';
+  if exists(select 1 from jsonb_array_elements(p_dados->'servicos') s
+    where coalesce(s->>'operadorId','')<>'' and not exists(
+      select 1 from jsonb_array_elements(operadores) o where o->>'id'=s->>'operadorId'
+        and (s->>'estado'='Concluído' or o->>'ativo'='true'))) then
+    raise exception 'Há um serviço vinculado a um operador inexistente ou desativado.';
+  end if;
+  if exists(select 1 from jsonb_array_elements(p_dados->'servicos') s
+    where s->>'estado'='Andamento' and coalesce(s->>'operadorId','')<>''
+    group by s->>'operadorId' having count(*)>1) then
+    raise exception 'Um operador não pode manter dois serviços em andamento. Outros operadores podem trabalhar em paralelo.';
+  end if;
+  -- Serviços que já estavam em execução antes desta atualização são preservados.
+  -- Novos inícios e retomadas exigem um operador. Nunca inventamos um responsável antigo.
+  if exists(select 1 from jsonb_array_elements(p_dados->'servicos') s
+    where s->>'estado'='Andamento' and coalesce(s->>'operadorId','')='' and not exists(
+      select 1 from jsonb_array_elements(linha.dados->'servicos') old
+      where old->>'id'=s->>'id' and old->>'estado'='Andamento' and coalesce(old->>'operadorId','')=''
+        and old->'segmentoInicio' is not distinct from s->'segmentoInicio'
+        and old->'inicioTrabalho' is not distinct from s->'inicioTrabalho')) then
+    raise exception 'Identifique o operador pelo cartão antes de iniciar ou retomar um serviço.';
+  end if;
+  if exists(select 1 from jsonb_array_elements(p_dados->'eventos') e
+    where e->>'tipo' in ('INÍCIO','RETOMADA','INTERRUPÇÃO','CONCLUSÃO','TRABALHO REGISTRADO')
+      and not exists(select 1 from jsonb_array_elements(linha.dados->'eventos') old where old->>'id'=e->>'id')
+      and not exists(select 1 from jsonb_array_elements(operadores) o where o->>'id'=e->>'operadorId')) then
+    raise exception 'Um novo apontamento está sem operador. Confira o cartão e o histórico antes de sincronizar.';
   end if;
   update public.fabrica_aw_estado_v2 set dados=p_dados,revisao=revisao+1,atualizado_em=now()
     where usuario_id=u and sala=p_sala returning * into linha;
   insert into public.fabrica_aw_mutacoes_v2(usuario_id,sala,mutacao,revisao) values(u,p_sala,p_mutacao,linha.revisao);
   return jsonb_build_object('aplicada',true,'revisao',linha.revisao,'dados',linha.dados);
+end;
+$$;
+revoke all on function public.fabrica_aw_sync_v3(text,bigint,jsonb,uuid) from public, anon;
+grant execute on function public.fabrica_aw_sync_v3(text,bigint,jsonb,uuid) to authenticated;
+
+-- Clientes antigos podem consultar, mas não gravar com a regra antiga.
+create or replace function public.fabrica_aw_sync_v2(
+  p_sala text,p_revisao bigint default null,p_dados jsonb default null,p_mutacao uuid default null
+) returns jsonb language plpgsql security definer set search_path = '' as $$
+begin
+  if auth.uid() is null then raise exception 'Entre na conta da fábrica.' using errcode='42501'; end if;
+  if p_dados is not null then raise exception 'Atualize este aparelho para a versão 3 — operadores e cartões. Feche todas as janelas e reabra. Os registros locais foram mantidos.'; end if;
+  return public.fabrica_aw_sync_v3(p_sala,null,null,null);
 end;
 $$;
 revoke all on function public.fabrica_aw_sync_v2(text,bigint,jsonb,uuid) from public, anon;
